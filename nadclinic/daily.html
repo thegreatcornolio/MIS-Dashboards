@@ -194,6 +194,13 @@ document.getElementById('agent-modal').addEventListener('click',function(e){if(e
     .am-qual-lbl{font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;color:var(--text2)}
     .am-qual-val{font-size:13px;color:var(--text)}
 
+    
+    .tab-nav{background:var(--offwhite);border-bottom:1px solid var(--border)}
+    .tab-nav-inner{max-width:1200px;margin:0 auto;padding:0 32px;display:flex;gap:2px}
+    .tab-link{padding:11px 16px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--text3);text-decoration:none;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s;white-space:nowrap}
+    .tab-link:hover{color:var(--text)}
+    .tab-link.active{color:var(--text);border-bottom-color:var(--green)}
+
     @media(max-width:960px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.two-col,.three-col{grid-template-columns:1fr}}
     @media(max-width:640px){.nav{padding:0 16px}.hero-inner,.container,.import-bar{padding-left:16px;padding-right:16px}.kpi-grid{grid-template-columns:1fr 1fr}.hero-inner{flex-direction:column;align-items:flex-start}}
   </style>
@@ -221,6 +228,8 @@ document.getElementById('agent-modal').addEventListener('click',function(e){if(e
       <button class="btn-signout" onclick="signOut()">Sign out</button>
     </div>
   </nav>
+
+<div class="tab-nav"><div id="tab-nav-inner" class="tab-nav-inner"></div></div>
 
   <div class="hero">
     <div class="hero-inner">
@@ -331,6 +340,20 @@ document.getElementById('agent-modal').addEventListener('click',function(e){if(e
 <script>
 'use strict';
 
+function parseIso(v){if(!v)return null;if(typeof v==='string'){const d=v.match(/\/Date\((\d+)/);if(d)return new Date(parseInt(d[1]));return new Date(v);}return new Date(v);}
+
+function setTabNav(active){
+  const c=encodeURIComponent(S.campaign);
+  document.getElementById('tab-nav-inner').innerHTML=[
+    ['daily','📊 Daily',`daily.html?campaign=${c}`],
+    ['weekly','📈 Weekly',`weekly.html?campaign=${c}`],
+    ['monthly','📅 Monthly',`monthly.html?campaign=${c}`],
+    ['agents','👤 Agents',`agents.html?campaign=${c}`],
+    ['queue','⏱ Queue',`queue.html?campaign=${c}`],
+  ].map(([id,lbl,href])=>`<a class="tab-link${id===active?' active':''}" href="${href}">${lbl}</a>`).join('');
+}
+
+
 const SESSION_KEY = 'mis_session';
 
 const FLOWS = {
@@ -429,25 +452,25 @@ async function loadData() {
 
 /* ── render KPIs ── */
 function renderKPIs(v, sent) {
-  const total  = v.TotalConvs  || 0;
-  const email  = v.EmailCount  || 0;
-  const voice  = v.VoiceCount  || 0;
-  const inb    = v.InboundCount|| 0;
-  const out    = v.OutboundCount||0;
-  const aht    = v.AvgDurationSec ? fmtSec(v.AvgDurationSec) : '—';
-  const emailPct = total ? Math.round(email/total*100) : 0;
-  const inbPct   = total ? Math.round(inb/total*100)   : 0;
+  const total    = parseInt(v.TotalConvs)    ||0;
+  const email    = parseInt(v.EmailCount)    ||0;
+  const voice    = parseInt(v.VoiceCount)    ||0;
+  const wa       = parseInt(v.WhatsAppCount) ||0;
+  const inb      = parseInt(v.InboundCount)  ||0;
+  const out      = parseInt(v.OutboundCount) ||0;
+  const inbPct   = total ? Math.round(inb/total*100) : 0;
+  const emailAHT = fmtSec(v.AvgEmailAgentSec);
+  const voiceAHT = fmtSec(v.AvgVoiceHandleSec);
+  const waAHT    = fmtSec(v.AvgWhatsAppAgentSec);
   const pos = (sent.find(s=>s.Sentiment==='Positive')||{}).Count||0;
   const neg = (sent.find(s=>s.Sentiment==='Negative')||{}).Count||0;
-  const sentClass = !total ? 'badge-grey' : (neg/total>0.2)?'badge-red':(pos/total>0.6)?'badge-green':'badge-orange';
-  const sentLabel = !total ? '—' : (neg/total>0.2)?'Watch':'Good';
-
-  document.getElementById('kpi-grid').innerHTML = `
+  const sentClass = !total?'badge-grey':(neg/total>0.2)?'badge-red':(pos/total>0.6)?'badge-green':'badge-orange';
+  const sentLabel = !total?'—':(neg/total>0.2)?'Watch':'Good';
+  document.getElementById('kpi-grid').innerHTML=`
     <div class="kpi-card">
       <div class="kpi-label">Total conversations</div>
       <div class="kpi-value">${total.toLocaleString()}</div>
-      <div class="kpi-sub">${email} email · ${voice} voice</div>
-      <span class="kpi-badge badge-blue">${emailPct}% email</span>
+      <div class="kpi-sub">${email} email · ${voice} voice · ${wa} WhatsApp</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Inbound</div>
@@ -456,9 +479,12 @@ function renderKPIs(v, sent) {
       <span class="kpi-badge badge-green">Inbound split</span>
     </div>
     <div class="kpi-card">
-      <div class="kpi-label">Avg handle time</div>
-      <div class="kpi-value" style="font-size:22px;margin-top:4px">${aht}</div>
-      <div class="kpi-sub">Per conversation</div>
+      <div class="kpi-label">Handle time by channel</div>
+      <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:var(--text3)">📧 Email</span><span style="font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700">${emailAHT}</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:var(--text3)">📞 Voice</span><span style="font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700">${voiceAHT}</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:var(--text3)">💬 WhatsApp</span><span style="font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700">${waAHT}</span></div>
+      </div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Sentiment health</div>
