@@ -187,6 +187,27 @@
   </div>
 </div>
 
+
+<!-- ADMIN LOGIN SCREEN -->
+<div id="admin-login" style="display:none;min-height:100vh;background:var(--navy);align-items:center;justify-content:center;">
+  <div style="background:#2a2a2a;border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:48px 40px;width:100%;max-width:400px;text-align:center">
+    <img src="/trilogy-logo.png" alt="Trilogy" style="height:32px;margin-bottom:24px">
+    <div style="color:var(--green);font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px">MIS Dashboard</div>
+    <div style="color:#fff;font-family:'Montserrat',sans-serif;font-size:20px;font-weight:800;margin-bottom:24px">Admin Access</div>
+    <div id="al-err" style="display:none;background:rgba(192,57,43,0.14);border:1px solid rgba(192,57,43,0.3);border-radius:8px;padding:10px 14px;color:#ffa0a0;font-size:13px;margin-bottom:14px">Incorrect credentials.</div>
+    <input id="al-user" type="text" placeholder="Username" autocomplete="off"
+      style="width:100%;padding:11px 14px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#fff;font-family:'Wix Madefor Text',sans-serif;font-size:14px;outline:none;margin-bottom:10px">
+    <input id="al-pass" type="password" placeholder="Password"
+      style="width:100%;padding:11px 14px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#fff;font-family:'Wix Madefor Text',sans-serif;font-size:14px;outline:none;margin-bottom:16px"
+      onkeydown="if(event.key==='Enter')submitAdminLogin()">
+    <button onclick="submitAdminLogin()"
+      style="width:100%;padding:13px;background:#fff;color:var(--navy);border:none;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.04em">
+      Access Admin Panel
+    </button>
+    <div style="margin-top:20px"><a href="index.html" style="color:rgba(255,255,255,0.3);font-size:12px;text-decoration:none">← Back to campaigns</a></div>
+  </div>
+</div>
+
 <div id="app" style="display:none">
   <nav class="nav">
     <div class="nav-left">
@@ -296,9 +317,9 @@ let S={session:null,users:[],campaigns:[],deleteTarget:null,editTarget:null};
 window.addEventListener('DOMContentLoaded',()=>{
   const raw=sessionStorage.getItem(SESSION_KEY);
   const adminUnlocked=sessionStorage.getItem(ADMIN_KEY);
-  if(!adminUnlocked){window.location.href='index.html';return;}
-  const _adminRaw=sessionStorage.getItem('mis_admin_session')||raw;
-  S.session=_adminRaw?JSON.parse(_adminRaw):{displayName:'Admin',role:'admin',campaigns:[]};
+  // No sessionStorage dependency — password prompt is built into this page
+  S.session = raw ? JSON.parse(raw) : {displayName:'Admin',role:'admin',campaigns:[]};
+  if(!adminUnlocked){showAdminLogin();return;}
   document.getElementById('nav-av').textContent=initials(S.session.displayName);
   document.getElementById('nav-name').textContent=S.session.displayName.split(' ')[0];
   document.getElementById('f-active').addEventListener('change',e=>{
@@ -475,6 +496,26 @@ function showToast(msg,type='success'){
   t._timer=setTimeout(()=>t.className='toast',3500);
 }
 
+
+const ADMIN_USER='admin', ADMIN_PASS='YouCantComeIn';
+function showAdminLogin(){
+  document.getElementById('admin-login').style.display='flex';
+  document.getElementById('app').style.display='none';
+  setTimeout(()=>document.getElementById('al-user').focus(),100);
+}
+function submitAdminLogin(){
+  const u=document.getElementById('al-user').value.trim();
+  const p=document.getElementById('al-pass').value;
+  if(u===ADMIN_USER&&p===ADMIN_PASS){
+    document.getElementById('admin-login').style.display='none';
+    document.getElementById('app').style.display='block';
+    loadData();
+  }else{
+    document.getElementById('al-err').style.display='block';
+    document.getElementById('al-pass').value='';
+    document.getElementById('al-pass').focus();
+  }
+}
 function signOut(){sessionStorage.removeItem(SESSION_KEY);sessionStorage.removeItem(ADMIN_KEY);window.location.href='index.html';}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeUserModal();closeDeleteModal();}});
 document.getElementById('user-modal').addEventListener('click',function(e){if(e.target===this)closeUserModal();});
