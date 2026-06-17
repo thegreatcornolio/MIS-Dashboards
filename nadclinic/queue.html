@@ -82,7 +82,7 @@
       <div class="nav-divider"></div>
       <div class="nav-section">MIS Dashboard</div>
       <div class="nav-divider"></div>
-      <a class="nav-back" href="../index.html">← Campaigns</a>
+      <a class="nav-back" href="../oldindex.html">← Campaigns</a>
     </div>
     <div class="nav-right">
       <div class="nav-avatar" id="nav-av"></div>
@@ -187,6 +187,7 @@ function setTabNav(active){
     ['monthly','📅 Monthly',`monthly.html?campaign=${c}`],
     ['agents','👤 Agents',`agents.html?campaign=${c}`],
     ['queue','⏱ Queue',`queue.html?campaign=${c}`],
+    ['sla','📋 SLA',`sla.html?campaign=${c}`],
   ].map(([id,lbl,href])=>`<a class="tab-link${id===active?' active':''}" href="${href}">${lbl}</a>`).join('');
 }
 

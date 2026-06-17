@@ -220,7 +220,7 @@ document.getElementById('agent-modal').addEventListener('click',function(e){if(e
       <div class="nav-divider"></div>
       <div class="nav-section">MIS Dashboard</div>
       <div class="nav-divider"></div>
-      <a class="nav-back" href="../index.html">← Campaigns</a>
+      <a class="nav-back" href="../oldindex.html">← Campaigns</a>
     </div>
     <div class="nav-right">
       <div class="nav-avatar" id="nav-av"></div>
@@ -294,14 +294,29 @@ document.getElementById('agent-modal').addEventListener('click',function(e){if(e
               <th>Missed</th>
               <th>AHT</th>
               <th>Utilisation</th>
-              <th>Outside SLA</th>
-              <th>Avg CSAT</th>
+              <th>SLA</th>
+              <th>Sales</th>
+              <th>Pres.</th>
+              <th>DMC</th>
+              <th>Close%</th>
             </tr>
           </thead>
           <tbody id="agent-tbody">
             <tr><td colspan="9"><div class="skel" style="height:40px;margin:8px 0"></div></td></tr>
           </tbody>
         </table>
+      </div>
+    </div>
+
+
+    <!-- Sales Performance -->
+    <div class="card" style="margin-bottom:20px" id="sales-card">
+      <div class="card-header">
+        <div class="card-title"><div class="card-icon" style="background:#fef3c7">💰</div>Sales performance</div>
+        <span id="sales-sub" style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:600;color:var(--text3)"></span>
+      </div>
+      <div class="card-body" id="sales-body" style="padding:16px 20px">
+        <div class="skel" style="height:60px"></div>
       </div>
     </div>
 
@@ -350,6 +365,7 @@ function setTabNav(active){
     ['monthly','📅 Monthly',`monthly.html?campaign=${c}`],
     ['agents','👤 Agents',`agents.html?campaign=${c}`],
     ['queue','⏱ Queue',`queue.html?campaign=${c}`],
+    ['sla','📋 SLA',`sla.html?campaign=${c}`],
   ].map(([id,lbl,href])=>`<a class="tab-link${id===active?' active':''}" href="${href}">${lbl}</a>`).join('');
 }
 
@@ -408,6 +424,35 @@ function shiftDate(days) {
   document.getElementById('date-picker').value = S.date;
   loadData();
 }
+
+/* ── SALES PERFORMANCE ── */
+function renderSales(agents) {
+  const totalSales = agents.reduce((s,a)=>s+(parseInt(a.Sales)||0),0);
+  const totalPres  = agents.reduce((s,a)=>s+(parseInt(a.Presentations)||0),0);
+  const totalDMC   = agents.reduce((s,a)=>s+(parseInt(a.DMC)||0),0);
+  const closeRate  = totalDMC>0?Math.round(totalSales/totalDMC*100):0;
+  const dmc2pres   = totalDMC>0?Math.round(totalPres/totalDMC*100):0;
+  document.getElementById('sales-sub').textContent = totalDMC>0?closeRate+'% close rate':'No sales data';
+  document.getElementById('sales-body').innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+      <div style="text-align:center;padding:12px;background:var(--offwhite);border-radius:var(--radius)">
+        <div style="font-family:'Montserrat',sans-serif;font-size:24px;font-weight:900;color:var(--green-dark)">${totalSales}</div>
+        <div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-top:3px">Sales</div>
+      </div>
+      <div style="text-align:center;padding:12px;background:var(--offwhite);border-radius:var(--radius)">
+        <div style="font-family:'Montserrat',sans-serif;font-size:24px;font-weight:900;color:var(--blue)">${totalPres}</div>
+        <div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-top:3px">Presentations</div>
+      </div>
+      <div style="text-align:center;padding:12px;background:var(--offwhite);border-radius:var(--radius)">
+        <div style="font-family:'Montserrat',sans-serif;font-size:24px;font-weight:900;color:var(--text)">${totalDMC}</div>
+        <div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-top:3px">DMC</div>
+      </div>
+      <div style="text-align:center;padding:12px;background:var(--offwhite);border-radius:var(--radius)">
+        <div style="font-family:'Montserrat',sans-serif;font-size:24px;font-weight:900;color:${closeRate>=20?'var(--green-dark)':closeRate>=10?'var(--orange)':'var(--red)'}">${totalDMC>0?closeRate+'%':'—'}</div>
+        <div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-top:3px">Close rate</div>
+      </div>
+    </div>`;
+}
 function signOut() { sessionStorage.removeItem(SESSION_KEY); window.location.href='../index.html'; }
 
 /* ── load data ── */
@@ -436,6 +481,7 @@ async function loadData() {
     renderKPIs(vol, sent);
     renderSentiment(sent, vol.TotalConvs||0);
     renderAgents(agts);
+    renderSales(agts);
     renderDepartments(depts);
     renderDispositions(disp);
     renderQueue(queue);

@@ -103,7 +103,7 @@
       <div class="nav-divider"></div>
       <div class="nav-section">MIS Dashboard</div>
       <div class="nav-divider"></div>
-      <a class="nav-back" href="../index.html">← Campaigns</a>
+      <a class="nav-back" href="../oldindex.html">← Campaigns</a>
     </div>
     <div class="nav-right">
       <div class="nav-avatar" id="nav-av"></div>
@@ -197,6 +197,7 @@ function setTabNav(active){
     ['monthly','📅 Monthly',`monthly.html?campaign=${c}`],
     ['agents','👤 Agents',`agents.html?campaign=${c}`],
     ['queue','⏱ Queue',`queue.html?campaign=${c}`],
+    ['sla','📋 SLA',`sla.html?campaign=${c}`],
   ].map(([id,lbl,href])=>`<a class="tab-link${id===active?' active':''}" href="${href}">${lbl}</a>`).join('');
 }
 
@@ -362,12 +363,15 @@ function renderAgents(rows){
     const occ=parseFloat(a.AvgOccupied)||0;
     const missed=parseInt(a.Missed)||0;
     const sla=parseInt(a.OutsideSLA)||0;
+    const sales=parseInt(a.TotalSales)||0;
+    const pres=parseInt(a.TotalPresentations)||0;
+    const dmc=parseInt(a.TotalDMC)||0;
+    const closeRate=dmc>0?Math.round(sales/dmc*100):0;
     const mc=missed===0?'badge-green':missed<5?'badge-orange':'badge-red';
     const sc=sla===0?'badge-green':sla<5?'badge-orange':'badge-red';
     return`<tr>
       <td><span class="agent-name">${a.AgentName}</span></td>
       <td><strong>${a.Total||0}</strong></td>
-      <td>${a.Answered||0}</td>
       <td><span class="badge ${mc}">${missed}</span></td>
       <td>${fmtSec(a.AvgAHTSec)}</td>
       <td>
@@ -375,6 +379,10 @@ function renderAgents(rows){
         ${fmtPct(occ)}
       </td>
       <td><span class="badge ${sc}">${sla}</span></td>
+      <td><strong style="color:${sales>0?'var(--green-dark)':'var(--text)'}">${sales}</strong></td>
+      <td>${pres}</td>
+      <td>${dmc}</td>
+      <td>${dmc>0?closeRate+'%':'—'}</td>
     </tr>`;
   }).join('');
 }

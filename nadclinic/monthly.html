@@ -110,7 +110,7 @@
       <div class="nav-divider"></div>
       <div class="nav-section">MIS Dashboard</div>
       <div class="nav-divider"></div>
-      <a class="nav-back" href="../index.html">← Campaigns</a>
+      <a class="nav-back" href="../oldindex.html">← Campaigns</a>
     </div>
     <div class="nav-right">
       <div class="nav-avatar" id="nav-av"></div>
@@ -200,6 +200,7 @@ function setTabNav(active){
     ['monthly','📅 Monthly',`monthly.html?campaign=${c}`],
     ['agents','👤 Agents',`agents.html?campaign=${c}`],
     ['queue','⏱ Queue',`queue.html?campaign=${c}`],
+    ['sla','📋 SLA',`sla.html?campaign=${c}`],
   ].map(([id,lbl,href])=>`<a class="tab-link${id===active?' active':''}" href="${href}">${lbl}</a>`).join('');
 }
 
@@ -338,6 +339,10 @@ function renderLeaderboard(rows){
     const missed=parseInt(a.Missed)||0;
     const sla=parseInt(a.OutsideSLA)||0;
     const mc=missed===0?'#2a8a00':missed<5?'#92400e':'#c0392b';
+    const sales=parseInt(a.TotalSales)||0;
+    const pres=parseInt(a.TotalPresentations)||0;
+    const dmc=parseInt(a.TotalDMC)||0;
+    const closeRate=dmc>0?Math.round(sales/dmc*100):0;
     return`<div class="lb-row">
       <span class="lb-rank ${rankClass[i]||''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</span>
       <span class="lb-name">${a.AgentName}</span>
@@ -345,7 +350,9 @@ function renderLeaderboard(rows){
         <div class="lb-stat"><div class="lb-sv">${a.Total||0}</div><div class="lb-sl">Total</div></div>
         <div class="lb-stat"><div class="lb-sv">${fmtSec(a.AvgAHTSec)}</div><div class="lb-sl">Avg AHT</div></div>
         <div class="lb-stat"><div class="lb-sv" style="color:${mc}">${missed}</div><div class="lb-sl">Missed</div></div>
-        <div class="lb-stat"><div class="lb-sv">${fmtPct(occ)}</div><div class="lb-sl">Util.</div></div>
+        <div class="lb-stat"><div class="lb-sv" style="color:var(--green-dark)">${sales}</div><div class="lb-sl">Sales</div></div>
+        <div class="lb-stat"><div class="lb-sv">${pres}</div><div class="lb-sl">Pres.</div></div>
+        <div class="lb-stat"><div class="lb-sv">${dmc>0?closeRate+'%':'—'}</div><div class="lb-sl">Close%</div></div>
         <div class="lb-stat"><div class="lb-sv">${a.DaysAttendance||0}</div><div class="lb-sl">Days</div></div>
         <div class="lb-stat"><div class="lb-sv" style="color:${sla===0?'#2a8a00':'#c0392b'}">${sla}</div><div class="lb-sl">SLA</div></div>
       </div>
