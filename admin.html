@@ -298,7 +298,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   const adminUnlocked=sessionStorage.getItem(ADMIN_KEY);
   if(!raw||!adminUnlocked){window.location.href='index.html';return;}
   S.session=JSON.parse(raw);
-  if(S.session.role!=='admin'){window.location.href='index.html';return;}
+  if((S.session.role||'').toLowerCase()!=='admin'){window.location.href='index.html';return;}
   document.getElementById('nav-av').textContent=initials(S.session.displayName);
   document.getElementById('nav-name').textContent=S.session.displayName.split(' ')[0];
   document.getElementById('f-active').addEventListener('change',e=>{

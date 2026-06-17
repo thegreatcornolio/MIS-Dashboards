@@ -250,12 +250,12 @@ function renderKPIs(t){
     <div class="kpi-card">
       <div class="kpi-label">Avg handle time</div>
       <div class="kpi-value" style="font-size:22px;margin-top:4px">${fmtSec(t.AvgHandleSec)}</div>
-      <div class="kpi-sub">For answered calls</div>
+      <div class="kpi-sub">Answered calls only</div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-label">Avg ring time</div>
-      <div class="kpi-value" style="font-size:22px;margin-top:4px">${fmtSec(t.AvgRingSec)}</div>
-      <div class="kpi-sub">Before answer or abandon</div>
+      <div class="kpi-label">Answer rate</div>
+      <div class="kpi-value">${ansRate}%</div>
+      <div class="kpi-sub">${answered} of ${offered} calls answered</div>
     </div>`;
 }
 
