@@ -322,10 +322,11 @@ async function loadDashboard(account) {
 
     const user = rows[0];
     const session = {
-      email:        user.UserEmail,
-      displayName:  user.DisplayName,
-      role:         (user.Role || 'viewer').toLowerCase(),
-      campaigns:    user.Campaigns ? user.Campaigns.split(',').map(c=>c.trim()).filter(Boolean) : [],
+      email:          user.UserEmail,
+      displayName:    user.DisplayName,
+      role:           (user.Role || 'viewer').toLowerCase(),
+      campaigns:      user.Campaigns ? user.Campaigns.split(',').map(c=>c.trim()).filter(Boolean) : [],
+      billing_access: user.billing_access===1||user.billing_access===true||user.billing_access==='1'||user.billing_access==='True'||user.billing_access==='true',
     };
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
     renderDashboard(session);
