@@ -489,11 +489,12 @@ function closeDeleteModal(){document.getElementById('delete-modal').classList.re
 
 async function confirmDelete(){
   if(!S.deleteTarget)return;
+  const emailToDelete = S.deleteTarget;
   closeDeleteModal();
   document.getElementById('load-txt').textContent='Deleting user…';
   document.getElementById('loading-overlay').style.display='flex';
   try{
-    await callFlow(FLOWS.DELETE_USER,{email:S.deleteTarget});
+    await callFlow(FLOWS.DELETE_USER,{email:emailToDelete});
     showToast('User deleted.','success');
     await loadData();
   }catch(err){
