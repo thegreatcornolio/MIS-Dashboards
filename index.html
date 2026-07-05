@@ -239,10 +239,6 @@ const CONFIG = {
 
 const FLOWS = {
   VALIDATE_USER: 'https://default77cde95f930f495e89c64d2c30f6df.21.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/7c9e3ad348f3419da97081e29723d328/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=tBva4A3Khf41AIgPZYuZyt8SKCSX9y7wBONYSF-HteE',
-  // Add more flow URLs here as they are built:
-  GET_DAILY:     '',
-  GET_WEEKLY:    '',
-  GET_MONTHLY:   '',
 };
 
 const GRAPH_SCOPES = ['User.Read'];
@@ -373,47 +369,11 @@ function renderDashboard(session) {
       </div>
       <div class="section-label">Reports</div>
       <div class="report-grid">
-        <a class="report-card" href="nadclinic/daily.html?campaign=${encodeURIComponent(campaign)}">
-          <div class="rc-icon green">📊</div>
-          <div class="rc-title">Daily Dashboard</div>
-          <div class="rc-sub">Volume, sentiment, agent scorecard and queue metrics for a single day.</div>
-          <div class="rc-arrow">View report →</div>
-        </a>
-        <a class="report-card" href="nadclinic/weekly.html?campaign=${encodeURIComponent(campaign)}">
-          <div class="rc-icon blue">📈</div>
-          <div class="rc-title">Weekly Trends</div>
-          <div class="rc-sub">7-day rolling view of volume, sentiment and SLA compliance.</div>
-          <div class="rc-arrow">View report →</div>
-        </a>
-        <a class="report-card" href="nadclinic/monthly.html?campaign=${encodeURIComponent(campaign)}">
-          <div class="rc-icon orange">📅</div>
-          <div class="rc-title">Monthly Report</div>
-          <div class="rc-sub">Month-over-month comparison, agent ranking and disposition trends.</div>
-          <div class="rc-arrow">View report →</div>
-        </a>
-        <a class="report-card" href="nadclinic/agents.html?campaign=${encodeURIComponent(campaign)}">
-          <div class="rc-icon purple">👤</div>
-          <div class="rc-title">Agent Performance</div>
-          <div class="rc-sub">Individual agent drilldown — AHT, utilisation, CSAT, missed rate.</div>
-          <div class="rc-arrow">View report →</div>
-        </a>
-        <a class="report-card" href="nadclinic/queue.html?campaign=${encodeURIComponent(campaign)}">
-          <div class="rc-icon teal">⏱</div>
-          <div class="rc-title">Queue Analysis</div>
-          <div class="rc-sub">Queue wait times, handle times and department distribution.</div>
-          <div class="rc-arrow">View report →</div>
-        </a>
-        <a class="report-card" href="nadclinic/sla.html?campaign=${encodeURIComponent(campaign)}">
-          <div class="rc-icon" style="background:#fef3c7">📋</div>
-          <div class="rc-title">SLA Dashboard</div>
-          <div class="rc-sub">Voice service level, AHT, CSAT and productivity vs targets.</div>
-          <div class="rc-arrow">View report →</div>
-        </a>
         ${session.billing_access ? `
-        <a class="report-card" href="nadclinic/billing.html?campaign=${encodeURIComponent(campaign)}">
+        <a class="report-card" href="nadclinic/dpr.html?campaign=${encodeURIComponent(campaign)}">
           <div class="rc-icon" style="background:#e8f5e9">💷</div>
-          <div class="rc-title">Billing Report</div>
-          <div class="rc-sub">Productive hours, billed value and monthly target attainment per agent.</div>
+          <div class="rc-title">Daily Profit Report</div>
+          <div class="rc-sub">Productive hours and billing by agent — previous day, week, month, or full month to date.</div>
           <div class="rc-arrow">View report →</div>
         </a>` : ''}
         ${isAdmin ? `
